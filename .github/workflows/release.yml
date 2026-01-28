@@ -102,6 +102,34 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions build.keychain
           rm certificate.p12
 
+      - name: Sign PyInstaller binaries for macOS
+        if: startsWith(matrix.platform, 'macos')
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          echo "=== Signing all binaries in nexa-backend bundle ==="
+          BACKEND_DIR="frontend/src-tauri/binaries/nexa-backend"
+          
+          # Find and sign all executable binaries, dylibs, and so files
+          find "$BACKEND_DIR" -type f \( -name "*.so" -o -name "*.dylib" -o -name "Python" -o -name "nexa-backend" \) | while read -r binary; do
+            echo "Signing: $binary"
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary" || echo "Warning: Could not sign $binary"
+          done
+          
+          # Sign any frameworks
+          find "$BACKEND_DIR" -type d -name "*.framework" | while read -r framework; do
+            echo "Signing framework: $framework"
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" --deep "$framework" || echo "Warning: Could not sign $framework"
+          done
+          
+          # Sign the main executable again to ensure it's properly signed
+          echo "Signing main executable: $BACKEND_DIR/nexa-backend"
+          codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$BACKEND_DIR/nexa-backend"
+          
+          echo "=== Verifying signatures ==="
+          codesign -vvv --deep --strict "$BACKEND_DIR/nexa-backend" || true
+          echo "=== Signing complete ==="
+
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
