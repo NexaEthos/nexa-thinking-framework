@@ -110,24 +110,59 @@ jobs:
           echo "=== Signing all binaries in nexa-backend bundle ==="
           BACKEND_DIR="frontend/src-tauri/binaries/nexa-backend"
           
-          # Find and sign all executable binaries, dylibs, and so files
-          find "$BACKEND_DIR" -type f \( -name "*.so" -o -name "*.dylib" -o -name "Python" -o -name "nexa-backend" \) | while read -r binary; do
+          # First, handle Python.framework specially - it has symlinks that cause signing issues
+          PYTHON_FRAMEWORK="$BACKEND_DIR/_internal/Python.framework"
+          if [ -d "$PYTHON_FRAMEWORK" ]; then
+            echo "=== Handling Python.framework ==="
+            
+            # Find the actual Python version directory (e.g., Versions/3.12)
+            PYTHON_VERSION_DIR=$(find "$PYTHON_FRAMEWORK/Versions" -maxdepth 1 -type d -name "3.*" | head -1)
+            
+            if [ -n "$PYTHON_VERSION_DIR" ]; then
+              echo "Found Python version: $PYTHON_VERSION_DIR"
+              
+              # Sign the actual binary in the versioned directory
+              PYTHON_BIN="$PYTHON_VERSION_DIR/Python"
+              if [ -f "$PYTHON_BIN" ] && [ ! -L "$PYTHON_BIN" ]; then
+                echo "Signing real Python binary: $PYTHON_BIN"
+                codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$PYTHON_BIN"
+              fi
+              
+              # Sign any Resources or other content in the version directory
+              find "$PYTHON_VERSION_DIR" -type f \( -name "*.so" -o -name "*.dylib" \) | while read -r binary; do
+                if [ ! -L "$binary" ]; then
+                  echo "Signing: $binary"
+                  codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary" || true
+                fi
+              done
+            fi
+            
+            # Now sign the framework bundle itself
+            echo "Signing Python.framework bundle"
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$PYTHON_FRAMEWORK"
+          fi
+          
+          # Sign all other .so and .dylib files (excluding symlinks and already-handled framework)
+          find "$BACKEND_DIR" -type f \( -name "*.so" -o -name "*.dylib" \) ! -path "*/Python.framework/*" | while read -r binary; do
             echo "Signing: $binary"
             codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary" || echo "Warning: Could not sign $binary"
           done
           
-          # Sign any frameworks
-          find "$BACKEND_DIR" -type d -name "*.framework" | while read -r framework; do
-            echo "Signing framework: $framework"
-            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" --deep "$framework" || echo "Warning: Could not sign $framework"
-          done
+          # Sign standalone Python binary if it exists (outside framework)
+          if [ -f "$BACKEND_DIR/_internal/Python" ] && [ ! -L "$BACKEND_DIR/_internal/Python" ]; then
+            echo "Signing standalone Python binary"
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$BACKEND_DIR/_internal/Python"
+          fi
           
-          # Sign the main executable again to ensure it's properly signed
+          # Sign the main executable
           echo "Signing main executable: $BACKEND_DIR/nexa-backend"
           codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$BACKEND_DIR/nexa-backend"
           
           echo "=== Verifying signatures ==="
           codesign -vvv --deep --strict "$BACKEND_DIR/nexa-backend" || true
+          if [ -d "$PYTHON_FRAMEWORK" ]; then
+            codesign -vvv --deep --strict "$PYTHON_FRAMEWORK" || true
+          fi
           echo "=== Signing complete ==="
 
       - name: Build Tauri app
