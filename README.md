@@ -101,26 +101,49 @@ Open the app and go to **Settings** to configure:
 ```bash
 # Show all available commands
 make help
-
-# Development mode (browser)
-make start    # Starts backend (port 8000) and frontend (port 5173)
-make stop     # Stops all services
-make clean    # Remove build artifacts and caches
 ```
+
+**Development (macOS/Linux):**
+
+| Command | Description |
+|---------|-------------|
+| `make install` | Set up Python venv and install all dependencies |
+| `make start` | Start backend (port 8000) and frontend (port 5173) |
+| `make stop` | Stop all running services |
+| `make clean` | Remove build artifacts and caches |
+
+**Desktop Application (macOS/Linux):**
+
+| Command | Description |
+|---------|-------------|
+| `make desktop` | Build and open the desktop app |
+| `make desktop-build` | Build desktop app (creates .app/.dmg or .AppImage) |
+| `make desktop-dev` | Run desktop app in dev mode (hot reload) |
+| `make build-backend` | Build Python backend with PyInstaller |
+
+**Desktop Application (Windows - PowerShell or CMD):**
+
+| Command | Description |
+|---------|-------------|
+| `make install-win` | Set up Python venv and install dependencies |
+| `make build-backend-win` | Build Python backend with PyInstaller |
+| `make desktop-build-win` | Build desktop app (creates .msi) |
+| `make desktop-win` | Build and open the desktop app |
+| `make clean-win` | Remove build artifacts |
+
+**Release (triggers GitHub Actions CI build):**
+
+| Command | Description |
+|---------|-------------|
+| `make release VERSION=v1.0.1` | Create new release |
+| `make release-update VERSION=v1.0.0` | Replace existing release |
 
 Access the application at `http://localhost:5173`
 
-### Desktop Application (Tauri)
+### Desktop Application
 
-Build and run as a standalone desktop app:
+The desktop app is built with [Tauri 2.0](https://tauri.app/) and bundles the Python backend as a sidecar, so no separate server is needed. Use the commands above to build for your platform.
 
-```bash
-make desktop       # Build and open the app
-make desktop-build # Build only (creates .app and .dmg in release/)
-make desktop-dev   # Development mode with hot reload
-```
-
-The desktop app bundles the Python backend as a sidecar, so no separate server is needed.
 Output files are copied to the `release/` folder.
 
 ## Project Structure
@@ -190,7 +213,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## Acknowledgments
 
-- Built with [FastAPI](https://fastapi.tiangolo.com/) and [React](https://reactjs.org/)
+- Built with [FastAPI](https://fastapi.tiangolo.com/), [React](https://reactjs.org/), and [Tauri](https://tauri.app/)
 - Inspired by chain-of-thought prompting research
 - Designed for learning and experimentation with multi-agent systems
 
