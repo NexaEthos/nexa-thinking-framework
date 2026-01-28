@@ -2,11 +2,12 @@ import json
 import logging
 import aiofiles
 from dataclasses import dataclass, field, asdict
-from pathlib import Path
+
+from app.base_path import get_base_path
 
 logger = logging.getLogger(__name__)
 
-SETTINGS_FILE = Path(__file__).parent.parent.parent / "app_settings.json"
+SETTINGS_FILE = get_base_path() / "app_settings.json"
 
 
 DEFAULT_CANVAS_AGENT_PROMPT = """You are a Project Canvas Agent. Your job is to listen to a conversation between a user and an assistant about a project idea, and extract RICH, DETAILED information to build a comprehensive project canvas.

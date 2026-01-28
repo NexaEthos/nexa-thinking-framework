@@ -98,7 +98,7 @@
     "vector_size": 384
   },
   "qdrant": {
-    "enabled": true,
+    "enabled": false,
     "use_memory_search": true,
     "deployment": "local",
     "url": "http://localhost:6333",

@@ -2,7 +2,7 @@
   "server_type": "lm_studio",
   "address": "localhost",
   "port": 1234,
-  "model": "lfm2.5-1.2b-instruct-mlx@4bit",
+  "model": "liquid/lfm2.5-1.2b",
   "temperature": 0.7,
   "max_tokens": 128000,
   "timeout": 600

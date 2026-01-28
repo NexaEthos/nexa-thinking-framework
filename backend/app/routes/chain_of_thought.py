@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import asyncio
 from datetime import datetime
+from app.base_path import get_base_path
 from app.models.chain_of_thought import ChainOfThoughtRequest, ChainOfThoughtResponse
 from app.services.orchestrator import ChainOfThoughtOrchestrator
 from app.services.llm_proxy import LLMProxy
@@ -52,7 +53,8 @@ load_dotenv()
 
 router = APIRouter()
 
-QUESTIONS_FILE = os.getenv("QUESTIONS_FILE", "questions.json")
+_questions_env = os.getenv("QUESTIONS_FILE", "questions.json")
+QUESTIONS_FILE = str(get_base_path() / _questions_env)
 question_manager = QuestionManager(questions_file=QUESTIONS_FILE)
 
 

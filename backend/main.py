@@ -2,19 +2,11 @@ import logging
 import os
 import sys
 from contextlib import asynccontextmanager
-from pathlib import Path
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-
-def get_base_path() -> Path:
-    if getattr(sys, "frozen", False):
-        return Path(sys._MEIPASS)
-    return Path(__file__).parent
-
-
-if getattr(sys, "frozen", False):
-    os.chdir(get_base_path())
+from app.base_path import get_base_path
 from app.routes import (
     chain_of_thought,
     questions,
@@ -39,6 +31,9 @@ from app.services.qdrant_service import QdrantService
 from app.services.app_settings import get_app_settings
 from app.models.agents import APICallMetrics
 
+if getattr(sys, "frozen", False):
+    os.chdir(get_base_path())
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -57,10 +52,12 @@ async def lifespan(app: FastAPI):
     telemetry_service.add_listener(broadcast_metrics_listener)
     logger.info("Telemetry service initialized with WebSocket broadcast")
     qdrant_settings = get_app_settings().qdrant
+    logger.info(f"Qdrant enabled: {qdrant_settings.enabled}")
     if qdrant_settings.enabled:
         qdrant_service = await QdrantService.get_instance()
         await qdrant_service.initialize()
         logger.info("Qdrant service initialized")
+    logger.info("Lifespan startup complete, yielding...")
     yield
     telemetry_service.remove_listener(broadcast_metrics_listener)
     if qdrant_settings.enabled:

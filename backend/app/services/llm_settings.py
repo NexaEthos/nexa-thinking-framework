@@ -5,14 +5,15 @@ import os
 import aiofiles
 from dataclasses import dataclass, asdict
 from typing import Literal, TypeGuard
-from pathlib import Path
+
+from app.base_path import get_base_path
 
 logger = logging.getLogger(__name__)
 
 ServerType = Literal["lm_studio", "ollama", "vllm"]
 _VALID_SERVER_TYPES: tuple[ServerType, ...] = ("lm_studio", "ollama", "vllm")
 
-SETTINGS_FILE = Path(__file__).parent.parent.parent / "llm_settings.json"
+SETTINGS_FILE = get_base_path() / "llm_settings.json"
 
 
 def _is_valid_server_type(value: str) -> TypeGuard[ServerType]:

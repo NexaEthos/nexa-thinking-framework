@@ -2,12 +2,13 @@ import json
 import logging
 import aiofiles
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
+
+from app.base_path import get_base_path
 
 logger = logging.getLogger(__name__)
 
-AGENT_SETTINGS_FILE = Path(__file__).parent.parent.parent / "agent_settings.json"
+AGENT_SETTINGS_FILE = get_base_path() / "agent_settings.json"
 
 
 class AgentSettingsError(Exception):

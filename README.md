@@ -22,6 +22,7 @@ A multi-agent orchestration framework for structured AI reasoning. Designed as a
 ### 📋 Multi-Agent Project Canvas
 
 - **4-section collaborative canvas** with specialized AI agents:
+  - 🔍 **Web Researcher** - Searches the web for relevant information
   - 🎯 **Identity Agent** - Project naming and essence definition
   - 📐 **Definition Agent** - Scope, features, and constraints
   - 🧰 **Resources Agent** - Tools, skills, and requirements (with web research)

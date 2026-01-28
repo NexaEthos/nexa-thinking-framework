@@ -1,6 +1,7 @@
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
+from ..base_path import get_base_path
 from ..services.llm_proxy import LLMProxy
 from ..services.orchestrator import ChainOfThoughtOrchestrator
 from ..services.question_manager import QuestionManager
@@ -104,7 +105,8 @@ async def index_project_canvas(canvas_summary: str) -> None:
     except Exception as e:
         logger.warning(f"Failed to index project context: {e}")
 
-QUESTIONS_FILE = os.getenv("QUESTIONS_FILE", "questions.json")
+_questions_env = os.getenv("QUESTIONS_FILE", "questions.json")
+QUESTIONS_FILE = str(get_base_path() / _questions_env)
 
 
 def get_orchestrator() -> ChainOfThoughtOrchestrator:

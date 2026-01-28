@@ -1,14 +1,15 @@
 import json
 import logging
 from dataclasses import dataclass, field, asdict
-from pathlib import Path
 from typing import Literal
+
+from app.base_path import get_base_path
 
 logger = logging.getLogger(__name__)
 
 WorkspaceType = Literal["chain_of_thought", "project_manager", "research_lab"]
 
-DEFAULT_PRESETS_FILE = Path(__file__).parent.parent.parent / "presets.json"
+DEFAULT_PRESETS_FILE = get_base_path() / "presets.json"
 
 
 @dataclass

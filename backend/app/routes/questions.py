@@ -1,12 +1,18 @@
 from fastapi import APIRouter, HTTPException
+from app.base_path import get_base_path
 from app.models.chain_of_thought import Question
 from app.services.question_manager import QuestionManager
+import logging
 import os
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-QUESTIONS_FILE = os.getenv("QUESTIONS_FILE", "questions.json")
+_questions_env = os.getenv("QUESTIONS_FILE", "questions.json")
+QUESTIONS_FILE = str(get_base_path() / _questions_env)
+logger.info(f"Questions file path: {QUESTIONS_FILE}")
 question_manager = QuestionManager(questions_file=QUESTIONS_FILE)
+logger.info(f"Loaded {len(question_manager.get_all_questions())} questions")
 
 
 @router.get("/questions", response_model=list[Question])
