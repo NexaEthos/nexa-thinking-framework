@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            name: macOS-arm64
+          - platform: macos-15
+            target: x86_64-apple-darwin
+            name: macOS-x64
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            name: Linux-x64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: Windows-x64
+
+    runs-on: ${{ matrix.platform }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Python backend
+        run: |
+          cd backend
+          python -m PyInstaller nexa-backend.spec --clean --noconfirm
+        shell: bash
+
+      - name: Copy backend to Tauri binaries
+        run: |
+          mkdir -p frontend/src-tauri/binaries
+          echo "=== PyInstaller output ==="
+          ls -la backend/dist/
+          ls -la backend/dist/nexa-backend/
+          cp -r backend/dist/nexa-backend frontend/src-tauri/binaries/
+          echo "=== Copied to Tauri binaries ==="
+          ls -la frontend/src-tauri/binaries/
+          ls -la frontend/src-tauri/binaries/nexa-backend/
+        shell: bash
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          pnpm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: frontend
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Nexa Thinking Framework ${{ github.ref_name }}'
+          releaseBody: |
+            ## Desktop Application
+            
+            Download the installer for your platform:
+            - **macOS (Apple Silicon)**: `.dmg` file for M1/M2/M3 Macs
+            - **macOS (Intel)**: `.dmg` file for Intel Macs  
+            - **Windows**: `.msi` installer
+            - **Linux**: `.AppImage` or `.deb` package
+            
+            **Requirements:**
+            - An OpenAI-compatible LLM server (LM Studio, Ollama, vLLM)
+            - Optionally: Qdrant for RAG features
+            
+            **Recommended Model:** [LFM2.5-1.2B-Instruct](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct) with 32K context
+            
+            See [README](https://github.com/NexaEthos/nexa-thinking-framework#readme) for setup instructions.
+          releaseDraft: false
+          prerelease: false

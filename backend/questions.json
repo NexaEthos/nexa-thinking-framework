@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "text": "What is the main problem being asked?",
+    "category": "analysis",
+    "enabled": true,
+    "created_at": "2026-01-22T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "text": "What are the key constraints or requirements?",
+    "category": "analysis",
+    "enabled": true,
+    "created_at": "2026-01-22T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "text": "What information do we need to solve this?",
+    "category": "planning",
+    "enabled": true,
+    "created_at": "2026-01-22T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "text": "What are the possible approaches to solve this?",
+    "category": "planning",
+    "enabled": true,
+    "created_at": "2026-01-22T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "text": "What is the step-by-step solution?",
+    "category": "solution",
+    "enabled": true,
+    "created_at": "2026-01-22T00:00:00.000Z"
+  }
+]

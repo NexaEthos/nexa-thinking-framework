@@ -1,0 +1,199 @@
+# Nexa Thinking Framework
+
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18+-61dafb.svg)](https://reactjs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A multi-agent orchestration framework for structured AI reasoning. Designed as an educational laboratory for experimenting with multi-agent prompt engineering, chain-of-thought reasoning, and LLM orchestration patterns.
+
+![Nexa Thinking Framework](https://img.shields.io/badge/🧠-Nexa%20Thinking-purple)
+
+## Features
+
+### 🔗 Chain of Thought Reasoning
+
+- Step-by-step reasoning with configurable analysis questions
+- Real-time streaming responses with thinking process visualization
+- Web search integration for fact-based answers
+- Request classification (simple, analytical, research)
+
+### 📋 Multi-Agent Project Canvas
+
+- **4-section collaborative canvas** with specialized AI agents:
+  - 🎯 **Identity Agent** - Project naming and essence definition
+  - 📐 **Definition Agent** - Scope, features, and constraints
+  - 🧰 **Resources Agent** - Tools, skills, and requirements (with web research)
+  - 📋 **Execution Agent** - Steps, phases, and milestones
+- Project Manager orchestration with `@mention` routing
+- Full context visibility across all agents
+
+### 📊 Telemetry & Observability
+
+- Real-time API metrics (tokens, latency, throughput)
+- Per-agent session statistics
+- Cost estimation (configurable $/1M tokens)
+
+### ⚙️ Flexible Configuration
+
+- Support for OpenAI-compatible APIs (vLLM, Ollama, LMStudio, etc.)
+- Customizable agent prompts and behaviors
+- Adjustable model parameters (temperature, max tokens)
+
+## Tech Stack
+
+**Backend:**
+
+- Python 3.12+
+- FastAPI with async/await
+- WebSocket for real-time streaming
+- Pydantic for data validation
+
+**Frontend:**
+
+- React 18 with TypeScript
+- Vite for fast development
+- Real-time WebSocket integration
+
+**Desktop App:**
+
+- Rust with Tauri 2.0
+- PyInstaller for backend bundling
+- Cross-platform support (macOS, Windows, Linux)
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.12+
+- Node.js 18+ and pnpm
+- An OpenAI-compatible LLM API (local or remote)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/MaxParisotto/nexa-thinking-framework.git
+cd nexa-thinking-framework
+
+# Install all dependencies (backend + frontend)
+make install
+
+# Or manually:
+# cd backend && python -m venv .venv && .venv/bin/pip install -r requirements.txt
+# cd frontend && pnpm install
+```
+
+### Configuration
+
+Open the app and go to **Settings** to configure:
+
+- **LLM Server** - Select your server type (LM Studio, Ollama, vLLM), address, port, and model
+- **Web Search** - Enable/disable and configure search parameters
+- **Vectors** - Set up Qdrant for RAG and configure embedding providers
+- **AI Agents** - Customize agent prompts and behaviors
+
+**Recommended Model:** We suggest using [LFM2.5-1.2B-Instruct](https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct) by Liquid AI with a 32,768 context length. It's a fast, efficient model optimized for agentic tasks, data extraction, and RAG - perfect for this framework. Available for LM Studio, Ollama, and vLLM.
+
+### Running
+
+```bash
+# Show all available commands
+make help
+
+# Development mode (browser)
+make start    # Starts backend (port 8000) and frontend (port 5173)
+make stop     # Stops all services
+make clean    # Remove build artifacts and caches
+```
+
+Access the application at `http://localhost:5173`
+
+### Desktop Application (Tauri)
+
+Build and run as a standalone desktop app:
+
+```bash
+make desktop       # Build and open the app
+make desktop-build # Build only (creates .app and .dmg in release/)
+make desktop-dev   # Development mode with hot reload
+```
+
+The desktop app bundles the Python backend as a sidecar, so no separate server is needed.
+Output files are copied to the `release/` folder.
+
+## Project Structure
+
+```
+nexa-thinking-framework/
+├── backend/
+│   ├── main.py                  # FastAPI application
+│   ├── app/
+│   │   ├── models/              # Pydantic data models
+│   │   ├── routes/              # API endpoints
+│   │   └── services/            # Business logic
+│   ├── llm_settings.json        # LLM configuration
+│   ├── agent_settings.json      # Agent prompts
+│   └── app_settings.json        # Application settings
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   ├── services/            # API and WebSocket clients
+│   │   └── types/               # TypeScript definitions
+│   ├── src-tauri/               # Tauri desktop app source
+│   └── index.html
+├── release/                     # Built desktop app (.app, .dmg)
+├── ARCHITECTURE.md              # Detailed architecture docs
+├── AGENTS.md                    # Development guidelines
+└── Makefile                     # Build commands (run: make help)
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/chain-of-thought/stream` | POST | Stream chain-of-thought reasoning |
+| `/api/project/chat` | POST | Multi-agent project chat |
+| `/api/canvas` | GET/POST | Canvas state management |
+| `/api/settings/*` | GET/PUT | Configuration management |
+| `/api/telemetry/*` | GET | Metrics and statistics |
+| `/api/logs/*` | GET/DELETE | Application logs |
+
+## Development
+
+```bash
+# Run linters
+cd backend && ruff check .
+cd frontend && pnpm lint
+
+# Type checking
+cd backend && mypy .
+cd frontend && pnpm tsc --noEmit
+```
+
+## Architecture
+
+The framework implements a multi-agent orchestration pattern where:
+
+1. **User input** is analyzed and classified
+2. **Chain of Thought** breaks complex queries into structured reasoning steps
+3. **Project Manager** routes requests to specialized agents via @mentions
+4. **Agents** process their sections with full context visibility
+5. **Canvas** maintains collaborative state across all agents
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed documentation.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with [FastAPI](https://fastapi.tiangolo.com/) and [React](https://reactjs.org/)
+- Inspired by chain-of-thought prompting research
+- Designed for learning and experimentation with multi-agent systems
+
+---
+
+**Repository:** [github.com/NexaEthos/nexa-thinking-framework](https://github.com/NexaEthos/nexa-thinking-framework)
