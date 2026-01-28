@@ -269,7 +269,7 @@
   width: 210mm;
   min-height: 297mm;
   max-width: 100%;
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   padding: 25mm 20mm 30mm 20mm;
@@ -725,7 +725,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 8px;
   font-size: 0.8rem;
@@ -1001,7 +1001,7 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.8rem;
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   font-size: 0.85rem;
   color: var(--text-secondary, #555);

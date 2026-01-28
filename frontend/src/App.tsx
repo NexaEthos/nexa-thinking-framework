@@ -12,6 +12,7 @@ import OnboardingTour, { useTourState } from "./components/OnboardingTour";
 import { GlossaryPanel } from "./components/EducationalTooltip";
 import RAGChunkViewer from "./components/RAGChunkViewer";
 import PromptHistory from "./components/PromptHistory";
+import ThemeToggle from "./components/ThemeToggle";
 import { wsService } from "./services/websocket";
 import { Step, Verification, Question, WebSocketMessage, ChatMessage } from "./types";
 import { submitChainOfThoughtRequest, getAppSettings, globalSystemReset, API_URL, waitForBackend, IS_TAURI } from "./services/api";
@@ -373,6 +374,7 @@ function App() {
               </button>
             </nav>
             <StatusIndicators />
+            <ThemeToggle />
             {error && (
               <div className="error-banner" role="alert" aria-live="assertive">
                 <span aria-hidden="true">⚠️</span>

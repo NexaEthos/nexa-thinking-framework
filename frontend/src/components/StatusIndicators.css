@@ -1,7 +1,6 @@
 .status-indicators {
   position: relative;
-  margin-left: auto;
-  transform: translateX(100px);
+  flex-shrink: 0;
 }
 
 .status-pill {

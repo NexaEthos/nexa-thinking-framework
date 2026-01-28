@@ -452,7 +452,7 @@
 }
 
 .memory-source-item {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-sm);
   padding: 0.375rem 0.5rem;
   font-size: 0.625rem;
@@ -711,7 +711,7 @@
 .pipeline-question-response {
   padding: 0.5rem 0.625rem;
   margin: 0 0.375rem 0.375rem 0.375rem;
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-sm);
   font-size: 0.75rem;

@@ -88,8 +88,8 @@ export function TelemetryBadge() {
           align-items: center;
           gap: 0.5rem;
           padding: 0.5rem 0.75rem;
-          background: white;
-          border: 1px solid var(--gray-200);
+          background: var(--card-bg);
+          border: 1px solid var(--border-color);
           border-radius: var(--radius-full);
           box-shadow: var(--shadow-md);
           cursor: pointer;
@@ -112,13 +112,13 @@ export function TelemetryBadge() {
         .badge-tokens {
           font-size: 0.75rem;
           font-weight: 600;
-          color: var(--gray-700);
+          color: var(--text-secondary);
         }
         .badge-cost {
           font-size: 0.6875rem;
-          color: var(--gray-500);
+          color: var(--text-muted);
           padding-left: 0.5rem;
-          border-left: 1px solid var(--gray-200);
+          border-left: 1px solid var(--border-color);
         }
       `}</style>
     </>
@@ -291,14 +291,15 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
         .telemetry-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.5);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 200;
         }
         .telemetry-panel {
-          background: white;
+          background: var(--card-bg);
+          border: 1px solid var(--border-color);
           border-radius: var(--radius-lg);
           box-shadow: var(--shadow-lg);
           width: 90%;
@@ -313,12 +314,13 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
           align-items: center;
           justify-content: space-between;
           padding: 1rem 1.25rem;
-          border-bottom: 1px solid var(--gray-200);
+          border-bottom: 1px solid var(--border-color);
         }
         .telemetry-panel .panel-header h3 {
           margin: 0;
           font-size: 1.125rem;
           font-weight: 600;
+          color: var(--text-primary);
         }
         .panel-loading, .panel-empty {
           display: flex;
@@ -326,7 +328,7 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
           align-items: center;
           justify-content: center;
           padding: 3rem;
-          color: var(--gray-500);
+          color: var(--text-muted);
         }
         .panel-content {
           padding: 1.25rem;
@@ -345,19 +347,20 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
           flex-direction: column;
           gap: 0.25rem;
           padding: 0.75rem;
-          background: var(--gray-50);
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
           border-radius: var(--radius-sm);
         }
         .summary-label {
           font-size: 0.6875rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: var(--gray-500);
+          color: var(--text-muted);
         }
         .summary-value {
           font-size: 1.125rem;
           font-weight: 600;
-          color: var(--gray-800);
+          color: var(--text-primary);
         }
         .summary-value.highlight {
           color: var(--primary);
@@ -369,7 +372,7 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
           margin: 0 0 0.75rem 0;
           font-size: 0.875rem;
           font-weight: 600;
-          color: var(--gray-700);
+          color: var(--text-secondary);
         }
         .breakdown-table {
           width: 100%;
@@ -380,15 +383,16 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
         .breakdown-table td {
           padding: 0.5rem 0.75rem;
           text-align: left;
-          border-bottom: 1px solid var(--gray-100);
+          border-bottom: 1px solid var(--border-color);
+          color: var(--text-secondary);
         }
         .breakdown-table th {
-          background: var(--gray-50);
+          background: var(--bg-tertiary);
           font-weight: 600;
           font-size: 0.6875rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: var(--gray-500);
+          color: var(--text-muted);
         }
         .agent-cell {
           display: flex;
@@ -402,7 +406,7 @@ export function TelemetryPanel({ visible, onClose }: TelemetryPanelProps) {
           display: flex;
           gap: 0.5rem;
           padding-top: 0.5rem;
-          border-top: 1px solid var(--gray-100);
+          border-top: 1px solid var(--border-color);
         }
       `}</style>
     </div>

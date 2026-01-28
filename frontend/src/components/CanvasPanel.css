@@ -43,7 +43,7 @@
 .canvas-section {
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
-  background: white;
+  background: var(--card-bg);
   transition: all 0.2s ease;
 }
 
@@ -610,7 +610,7 @@
 }
 
 .rag-result-item {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-sm);
   padding: 0.5rem;
   border: 1px solid #bae6fd;

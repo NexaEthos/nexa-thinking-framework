@@ -20,7 +20,7 @@
 .settings-sidebar {
   width: 220px;
   flex-shrink: 0;
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: var(--shadow-sm);
@@ -68,7 +68,7 @@
 
 .settings-main {
   flex: 1;
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   display: flex;
@@ -370,7 +370,7 @@
 .prompt-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: white;
+  background: var(--card-bg);
 }
 
 .prompts-header {
