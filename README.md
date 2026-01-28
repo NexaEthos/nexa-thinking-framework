@@ -74,7 +74,7 @@ A multi-agent orchestration framework for structured AI reasoning. Designed as a
 
 ```bash
 # Clone the repository
-git clone https://github.com/MaxParisotto/nexa-thinking-framework.git
+git clone https://github.com/NexaEthos/nexa-thinking-framework.git
 cd nexa-thinking-framework
 
 # Install all dependencies (backend + frontend)
