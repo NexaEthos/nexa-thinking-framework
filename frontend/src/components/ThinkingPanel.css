@@ -721,7 +721,7 @@
 
 .pipeline-question-response.streaming {
   border-color: var(--primary);
-  background: linear-gradient(90deg, white 0%, var(--primary-light) 100%);
+  background: linear-gradient(90deg, var(--card-bg) 0%, var(--primary-light) 100%);
 }
 
 .pipeline-question-response p {

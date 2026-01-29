@@ -34,6 +34,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Update version from tag
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "Updating version to $VERSION"
+          
+          # Update tauri.conf.json
+          sed -i.bak "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" frontend/src-tauri/tauri.conf.json
+          rm -f frontend/src-tauri/tauri.conf.json.bak
+          
+          # Update Cargo.toml
+          sed -i.bak "s/^version = \"[^\"]*\"/version = \"$VERSION\"/" frontend/src-tauri/Cargo.toml
+          rm -f frontend/src-tauri/Cargo.toml.bak
+          
+          # Update package.json
+          sed -i.bak "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" frontend/package.json
+          rm -f frontend/package.json.bak
+          
+          echo "Updated versions:"
+          grep '"version"' frontend/src-tauri/tauri.conf.json
+          grep '^version' frontend/src-tauri/Cargo.toml
+          grep '"version"' frontend/package.json | head -1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
