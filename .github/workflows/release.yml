@@ -28,6 +28,7 @@ jobs:
             name: Windows-x64
 
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 90
     
     steps:
       - name: Checkout
@@ -43,15 +44,34 @@ jobs:
         with:
           version: 9
 
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: frontend/src-tauri
 
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -111,24 +131,18 @@ jobs:
           BACKEND_DIR="frontend/src-tauri/binaries/nexa-backend"
           FRAMEWORK_DIR="$BACKEND_DIR/_internal/Python.framework"
           
-          # Fix Python.framework structure - flatten symlinks that break codesign
-          # PyInstaller creates a non-standard framework with symlinks that cause
-          # "bundle format is ambiguous" and invalid signature errors
           echo "=== Fixing Python.framework structure ==="
           if [ -d "$FRAMEWORK_DIR" ]; then
-            # Get the actual Python binary path (following symlinks)
             PYTHON_REAL=$(readlink -f "$FRAMEWORK_DIR/Versions/Current/Python" 2>/dev/null || readlink "$FRAMEWORK_DIR/Versions/Current/Python")
             PYTHON_VERSION=$(basename "$(dirname "$PYTHON_REAL")")
             
             echo "Python version directory: $PYTHON_VERSION"
             echo "Real Python binary: $PYTHON_REAL"
             
-            # Remove the problematic symlinks at framework root
             rm -f "$FRAMEWORK_DIR/Python" 2>/dev/null || true
             rm -rf "$FRAMEWORK_DIR/Versions/Current" 2>/dev/null || true
             rm -rf "$FRAMEWORK_DIR/Resources" 2>/dev/null || true
             
-            # Copy the actual binary to framework root (not symlink)
             if [ -f "$FRAMEWORK_DIR/Versions/$PYTHON_VERSION/Python" ]; then
               cp "$FRAMEWORK_DIR/Versions/$PYTHON_VERSION/Python" "$FRAMEWORK_DIR/Python"
               echo "Copied Python binary to framework root"
@@ -138,33 +152,32 @@ jobs:
             ls -la "$FRAMEWORK_DIR/" || true
           fi
           
-          echo "=== Signing all binaries ==="
+          echo "=== Signing all binaries in parallel ==="
           
-          # Sign all .so files
-          find "$BACKEND_DIR" -type f -name "*.so" | while read -r binary; do
-            echo "Signing: $binary"
-            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary"
-          done
+          # Create a signing function for parallel execution
+          sign_binary() {
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$1" 2>&1
+          }
+          export -f sign_binary
+          export APPLE_SIGNING_IDENTITY
           
-          # Sign all .dylib files  
-          find "$BACKEND_DIR" -type f -name "*.dylib" | while read -r binary; do
-            echo "Signing: $binary"
-            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary"
-          done
+          # Sign all .so and .dylib files in parallel (8 concurrent jobs)
+          find "$BACKEND_DIR" -type f \( -name "*.so" -o -name "*.dylib" \) | \
+            xargs -P 8 -I {} bash -c 'sign_binary "$@"' _ {}
           
-          # Sign Python binary at framework root (now a real file, not symlink)
+          echo "=== Signing Python binaries ==="
+          
+          # Sign Python binary at framework root
           if [ -f "$FRAMEWORK_DIR/Python" ]; then
             echo "Signing: $FRAMEWORK_DIR/Python"
             codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$FRAMEWORK_DIR/Python"
           fi
           
           # Sign Python in Versions directory
-          find "$BACKEND_DIR" -path "*/Versions/*/Python" -type f | while read -r binary; do
-            echo "Signing: $binary"
-            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$binary"
-          done
+          find "$BACKEND_DIR" -path "*/Versions/*/Python" -type f -exec \
+            codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" {} \;
           
-          # Sign standalone Python binary (not in framework)
+          # Sign standalone Python binary
           if [ -f "$BACKEND_DIR/_internal/Python" ]; then
             echo "Signing: $BACKEND_DIR/_internal/Python"
             codesign --force --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$BACKEND_DIR/_internal/Python"
@@ -176,9 +189,6 @@ jobs:
           
           echo "=== Verifying signatures ==="
           codesign -vvv "$BACKEND_DIR/nexa-backend"
-          if [ -f "$FRAMEWORK_DIR/Python" ]; then
-            codesign -vvv "$FRAMEWORK_DIR/Python"
-          fi
           echo "=== Signing complete ==="
 
       - name: Build Tauri app
